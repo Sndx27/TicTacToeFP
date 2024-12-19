@@ -9,7 +9,7 @@ import javax.swing.*;
 public class GameMain extends JPanel {
    private static final long serialVersionUID = 1L; // to prevent serializable warning
 
-   // Define named constants for the drawing graphics
+   // Define named onstants for the drawing graphics
    public static final String TITLE = "Tic Tac Toe";
    public static final Color COLOR_BG = Color.WHITE;
    public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
@@ -22,6 +22,9 @@ public class GameMain extends JPanel {
    private State currentState;  // the current state of the game
    private Seed currentPlayer;  // the current player
    private JLabel statusBar;    // for displaying status message
+
+   private AI ai; // Add ai
+
 
    /** Constructor to setup the UI and game components */
    public GameMain() {
@@ -37,13 +40,24 @@ public class GameMain extends JPanel {
             int col = mouseX / Cell.SIZE;
 
             if (currentState == State.PLAYING) {
-                SoundEffect.EAT_FOOD.play();
-               if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
-                     && board.cells[row][col].content == Seed.NO_SEED) {
-                  // Update cells[][] and return the new game state after the move
-                  currentState = board.stepGame(currentPlayer, row, col);
-                  // Switch player
-                  currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+               SoundEffect.EAT_FOOD.play();
+               if (currentPlayer == Seed.CROSS) { // Giliran pemain
+                  if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
+                        && board.cells[row][col].content == Seed.NO_SEED) {
+                     currentState = board.stepGame(currentPlayer, row, col);
+                     currentPlayer = Seed.NOUGHT; // Ganti giliran ke AI
+                     repaint();
+                  }
+               }
+       
+               if (currentPlayer == Seed.NOUGHT && currentState == State.PLAYING) { // Giliran AI
+                  SoundEffect.EAT_FOOD.play();
+
+                  int[] bestMove = ai.getBestMove();
+                     
+                  currentState = board.stepGame(currentPlayer, bestMove[0], bestMove[1]);
+                  currentPlayer = Seed.CROSS; // Ganti giliran ke pemain
+                  repaint();
                }
             } else {        // game over
                newGame();  // restart the game
@@ -76,6 +90,7 @@ public class GameMain extends JPanel {
    /** Initialize the game (run once) */
    public void initGame() {
       board = new Board();  // allocate the game-board
+      ai = new AI(board); // Make ai instance in board
    }
 
    /** Reset the game-board contents and the current-state, ready for new game */
