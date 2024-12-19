@@ -52,38 +52,41 @@ public class Board {
     *  Update cells[selectedRow][selectedCol]. Compute and return the
     *  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
     */
-   public State stepGame(Seed player, int selectedRow, int selectedCol) {
+    public State stepGame(Seed player, int selectedRow, int selectedCol) {
+      System.out.println("Step game called by: " + player + " at (" + selectedRow + ", " + selectedCol + ")");
+   
       // Update game board
       cells[selectedRow][selectedCol].content = player;
 
       // Compute and return the new game state
       if (cells[selectedRow][0].content == player  // 3-in-the-row
-                && cells[selectedRow][1].content == player
-                && cells[selectedRow][2].content == player
-             || cells[0][selectedCol].content == player // 3-in-the-column
-                && cells[1][selectedCol].content == player
-                && cells[2][selectedCol].content == player
-             || selectedRow == selectedCol     // 3-in-the-diagonal
-                && cells[0][0].content == player
-                && cells[1][1].content == player
-                && cells[2][2].content == player
-             || selectedRow + selectedCol == 2 // 3-in-the-opposite-diagonal
-                && cells[0][2].content == player
-                && cells[1][1].content == player
-                && cells[2][0].content == player) {
+            && cells[selectedRow][1].content == player
+            && cells[selectedRow][2].content == player
+         || cells[0][selectedCol].content == player // 3-in-the-column
+            && cells[1][selectedCol].content == player
+            && cells[2][selectedCol].content == player
+         || selectedRow == selectedCol     // 3-in-the-diagonal
+            && cells[0][0].content == player
+            && cells[1][1].content == player
+            && cells[2][2].content == player
+         || selectedRow + selectedCol == 2 // 3-in-the-opposite-diagonal
+            && cells[0][2].content == player
+            && cells[1][1].content == player
+            && cells[2][0].content == player) {
          return (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
       } else {
-         // Nobody win. Check for DRAW (all cells occupied) or PLAYING.
+         // Nobody wins. Check for DRAW or PLAYING.
          for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
-               if (cells[row][col].content == Seed.NO_SEED) {
-                  return State.PLAYING; // still have empty cells
-               }
+                  if (cells[row][col].content == Seed.NO_SEED) {
+                     return State.PLAYING; // Masih ada kotak kosong
+                  }
             }
          }
-         return State.DRAW; // no empty cell, it's a draw
+         return State.DRAW; // Tidak ada kotak kosong, game draw
       }
-   }
+  }
+  
 
    /** Paint itself on the graphics canvas, given the Graphics context */
    public void paint(Graphics g) {
@@ -107,4 +110,50 @@ public class Board {
          }
       }
    }
+
+   public State getGameState() {
+      // Periksa setiap baris
+      for (int row = 0; row < ROWS; row++) {
+          if (cells[row][0].content != Seed.NO_SEED
+                  && cells[row][0].content == cells[row][1].content
+                  && cells[row][1].content == cells[row][2].content) {
+              return (cells[row][0].content == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+          }
+      }
+  
+      // Periksa setiap kolom
+      for (int col = 0; col < COLS; col++) {
+         if (cells[0][col].content != Seed.NO_SEED
+                 && cells[0][col].content == cells[1][col].content
+                 && cells[1][col].content == cells[2][col].content) { 
+             return (cells[0][col].content == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+         }
+     }
+  
+      // Periksa diagonal utama
+      if (cells[0][0].content != Seed.NO_SEED
+              && cells[0][0].content == cells[1][1].content
+              && cells[1][1].content == cells[2][2].content) {
+          return (cells[0][0].content == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+      }
+  
+      // Periksa diagonal lainnya
+      if (cells[0][2].content != Seed.NO_SEED
+              && cells[0][2].content == cells[1][1].content
+              && cells[1][1].content == cells[2][0].content) {
+          return (cells[0][2].content == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+      }
+  
+      // Periksa apakah ada kotak kosong
+      for (int row = 0; row < ROWS; row++) {
+          for (int col = 0; col < COLS; col++) {
+              if (cells[row][col].content == Seed.NO_SEED) {
+                  return State.PLAYING; // Masih ada langkah yang bisa diambil
+              }
+          }
+      }
+  
+      return State.DRAW; // Semua kotak penuh, tidak ada pemenang
+  }
+  
 }

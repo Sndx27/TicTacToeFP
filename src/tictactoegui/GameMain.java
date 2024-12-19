@@ -23,33 +23,35 @@ public class GameMain extends JPanel {
    private Seed currentPlayer;  // the current player
    private JLabel statusBar;    // for displaying status message
 
+   AI ai = new AI(board); // initialize ai
+
    /** Constructor to setup the UI and game components */
    public GameMain() {
 
       // This JPanel fires MouseEvent
       super.addMouseListener(new MouseAdapter() {
          @Override
-         public void mouseClicked(MouseEvent e) {  // mouse-clicked handler
-            int mouseX = e.getX();
-            int mouseY = e.getY();
-            // Get the row and column clicked
-            int row = mouseY / Cell.SIZE;
-            int col = mouseX / Cell.SIZE;
-
-            if (currentState == State.PLAYING) {
-                SoundEffect.EAT_FOOD.play();
-               if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
-                     && board.cells[row][col].content == Seed.NO_SEED) {
-                  // Update cells[][] and return the new game state after the move
-                  currentState = board.stepGame(currentPlayer, row, col);
-                  // Switch player
-                  currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
-               }
-            } else {        // game over
-               newGame();  // restart the game
-            }
-            // Refresh the drawing canvas
-            repaint();  // Callback paintComponent().
+         public void mouseClicked(MouseEvent e) {
+             int mouseX = e.getX();
+             int mouseY = e.getY();
+             int row = mouseY / Cell.SIZE;
+             int col = mouseX / Cell.SIZE;
+         
+             if (currentState == State.PLAYING) {
+                 if (currentPlayer == Seed.CROSS) { // Giliran pemain
+                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
+                             && board.cells[row][col].content == Seed.NO_SEED) {
+                         currentState = board.stepGame(currentPlayer, row, col);
+                         currentPlayer = Seed.NOUGHT; // Ganti giliran ke AI
+                         repaint();
+                         if (currentState == State.PLAYING) { // Jika game belum selesai
+                             aiMove(); // Panggil AI untuk bermain
+                         }
+                     }
+                 }
+             } else { // Game selesai
+                 newGame(); // Restart game
+             }
          }
       });
 
@@ -75,7 +77,8 @@ public class GameMain extends JPanel {
 
    /** Initialize the game (run once) */
    public void initGame() {
-      board = new Board();  // allocate the game-board
+      board = new Board();
+      ai = new AI(board); // Buat instance AI dengan papa
    }
 
    /** Reset the game-board contents and the current-state, ready for new game */
@@ -116,15 +119,27 @@ public class GameMain extends JPanel {
    /** The entry "main" method */
    public static void play() {
       javax.swing.SwingUtilities.invokeLater(() -> {
-          JFrame frame = new JFrame(TITLE);
-          frame.setContentPane(new GameMain());
-          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-          frame.pack();
-          frame.setLocationRelativeTo(null);
-          frame.setVisible(true);
+         JFrame frame = new JFrame(TITLE);
+         frame.setContentPane(new GameMain());
+         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         frame.pack();
+         frame.setLocationRelativeTo(null);
+         frame.setVisible(true);
       });
-  }
+}
   
+   private void aiMove() {
+      if (currentState == State.PLAYING) { // Pastikan game belum selesai
+         int[] bestMove = ai.getBestMove(); // Dapatkan langkah terbaik dari AI
+         System.out.println("AI memilih langkah: (" + bestMove[0] + ", " + bestMove[1] + ")");
+         currentState = board.stepGame(currentPlayer, bestMove[0], bestMove[1]); // Jalankan langkah AI
+         currentPlayer = Seed.CROSS; // Ganti giliran ke pemain
+         repaint(); // Refresh tampilan game
+      }
+   }
+
+
+
 }
 
    

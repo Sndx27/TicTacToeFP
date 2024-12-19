@@ -42,11 +42,14 @@ public class WelcomeScreen extends JFrame {
         JButton startButton = new JButton("Start");
         startButton.setBounds(250, 120, 100, 40);
         startButton.addActionListener(e -> {
-            stopMusic();
-            GameMain.play(); 
-            dispose(); //welcomescreen ditutup saat start button ditekan
-            playMusic();
+            stopMusic();  // Hentikan musik background
+            dispose();    // Tutup WelcomeScreen
+            SwingUtilities.invokeLater(() -> {  // Pastikan GameMain dijalankan di thread UI
+                GameMain.play(); // Mulai game
+                
+            });
         });
+        
         backgroundPanel.add(startButton);
 
         // Option Button

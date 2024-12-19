@@ -4,9 +4,13 @@
  */
 package tictactoegui;
 
+import javax.swing.SwingUtilities;
+
 public class Main {
     public static void main(String[] args) {
-        GameMain game = new GameMain();
-        game.play();
+        SwingUtilities.invokeLater(() -> {
+            WelcomeScreen welcomeScreen = new WelcomeScreen();
+            welcomeScreen.setVisible(true);
+        });
     }
 }
