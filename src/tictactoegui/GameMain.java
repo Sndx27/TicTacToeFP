@@ -125,7 +125,7 @@ public class GameMain extends JPanel {
          new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                  Thread.sleep(600); // Tambahkan delay untuk AI
+                  Thread.sleep(350); // Tambahkan delay untuk AI
                   return null;
             }
             @Override
