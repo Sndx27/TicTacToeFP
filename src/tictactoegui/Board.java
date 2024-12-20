@@ -10,13 +10,15 @@ public class Board {
    public static final int ROWS = 3;  // ROWS x COLS cells
    public static final int COLS = 3;
    // Define named constants for drawing
-   public static final int CANVAS_WIDTH = Cell.SIZE * COLS;  // the drawing canvas
-   public static final int CANVAS_HEIGHT = Cell.SIZE * ROWS;
-   public static final int GRID_WIDTH = 8;  // Grid-line's width
+   public static final int CANVAS_WIDTH = Cell.SIZE * COLS + 500;  // the drawing canvas
+   public static final int CANVAS_HEIGHT = Cell.SIZE * ROWS + 500;
+   public static final int GRID_WIDTH = 4;  // Grid-line's width
    public static final int GRID_WIDTH_HALF = GRID_WIDTH / 2; // Grid-line's half-width
-   public static final Color COLOR_GRID = Color.LIGHT_GRAY;  // grid lines
-   public static final int Y_OFFSET = 1;  // Fine tune for better display
-
+   public static final Color COLOR_GRID = Color.BLACK;  // grid lines
+   public static final int BOARD_WIDTH = Cell.SIZE * COLS; // Lebar papan
+   public static final int BOARD_HEIGHT = Cell.SIZE * ROWS; // Tinggi papan
+   public static final int X_OFFSET = (CANVAS_WIDTH - BOARD_WIDTH) / 2; // Offset horizontal
+   public static final int Y_OFFSET = (CANVAS_HEIGHT - BOARD_HEIGHT) / 2; // Offset vertika
    // Define properties (package-visible)
    /** Composes of 2D array of ROWS-by-COLS Cell instances */
    Cell[][] cells;
@@ -90,27 +92,21 @@ public class Board {
 
    /** Paint itself on the graphics canvas, given the Graphics context */
    public void paint(Graphics g) {
-      // Draw the grid-lines
-      g.setColor(COLOR_GRID);
-      for (int row = 1; row < ROWS; ++row) {
-         g.fillRoundRect(0, Cell.SIZE * row - GRID_WIDTH_HALF,
-               CANVAS_WIDTH - 1, GRID_WIDTH,
-               GRID_WIDTH, GRID_WIDTH);
-      }
-      for (int col = 1; col < COLS; ++col) {
-         g.fillRoundRect(Cell.SIZE * col - GRID_WIDTH_HALF, 0 + Y_OFFSET,
-               GRID_WIDTH, CANVAS_HEIGHT - 1,
-               GRID_WIDTH, GRID_WIDTH);
-      }
-
-      // Draw all the cells
+      Graphics2D g2 = (Graphics2D) g;
+  
+      // Gambar border papan
+      g2.setColor(COLOR_GRID);
+      g2.setStroke(new BasicStroke(10)); // Atur ketebalan border
+      g2.drawRect(X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT); // Gambar border papan
+  
+      // Gambar semua cell
       for (int row = 0; row < ROWS; ++row) {
-         for (int col = 0; col < COLS; ++col) {
-            cells[row][col].paint(g);  // ask the cell to paint itself
-         }
+          for (int col = 0; col < COLS; ++col) {
+              cells[row][col].paint(g, X_OFFSET, Y_OFFSET); // Gambar cell dengan offset
+          }
       }
-   }
-
+  }
+  
    public State getGameState() {
       // Periksa setiap baris
       for (int row = 0; row < ROWS; row++) {

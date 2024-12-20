@@ -34,8 +34,8 @@ public class GameMain extends JPanel {
          public void mouseClicked(MouseEvent e) {
             int mouseX = e.getX();
             int mouseY = e.getY();
-            int row = mouseY / Cell.SIZE;
-            int col = mouseX / Cell.SIZE;
+            int row = (mouseY - Board.Y_OFFSET) / Cell.SIZE;
+            int col = (mouseX - Board.X_OFFSET) / Cell.SIZE;
       
             if (currentState == State.PLAYING) {
                if (currentPlayer == Seed.CROSS) { // Giliran pemain
@@ -130,19 +130,24 @@ public class GameMain extends JPanel {
   
    private void aiMove() {
       if (currentState == State.PLAYING) { // Pastikan game belum selesai
-         int[] bestMove = ai.getBestMove(); // Dapatkan langkah terbaik dari AI
-         System.out.println("AI memilih langkah: (" + bestMove[0] + ", " + bestMove[1] + ")");
-         currentState = board.stepGame(currentPlayer, bestMove[0], bestMove[1]); // Jalankan langkah AI
-         currentPlayer = Seed.CROSS; // Ganti giliran ke pemain
-         try {
-            Thread.sleep(300); // Tambahkan delay
-            repaint(); // Refresh tampilan game
-        } catch (InterruptedException a) {
-           a.printStackTrace(); // Tangani exception jika thread terganggu
-        }
+         new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                  Thread.sleep(600); // Tambahkan delay hanya untuk AI
+                  return null;
+            }
+
+            @Override
+            protected void done() {
+                  int[] bestMove = ai.getBestMove(); // Dapatkan langkah terbaik dari AI
+                  System.out.println("AI memilih langkah: (" + bestMove[0] + ", " + bestMove[1] + ")");
+                  currentState = board.stepGame(currentPlayer, bestMove[0], bestMove[1]); // Jalankan langkah AI
+                  currentPlayer = Seed.CROSS; // Ganti giliran ke pemain
+                  repaint(); // Refresh tampilan game
+            }
+         }.execute();
       }
    }
-
 
 
 }

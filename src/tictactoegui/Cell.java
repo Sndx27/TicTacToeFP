@@ -31,12 +31,23 @@ public class Cell {
    }
 
    /** Paint itself on the graphics canvas, given the Graphics context */
-   public void paint(Graphics g) {
-      // Draw the Seed if it is not empty
-      int x1 = col * SIZE + PADDING;
-      int y1 = row * SIZE + PADDING;
-      if (content == Seed.CROSS || content == Seed.NOUGHT) {
-         g.drawImage(content.getImage(), x1, y1, SEED_SIZE, SEED_SIZE, null);
+   public void paint(Graphics g, int xOffset, int yOffset) {
+      int x1 = xOffset + col * SIZE; // Posisi horizontal dengan offset
+      int y1 = yOffset + row * SIZE; // Posisi vertikal dengan offset
+  
+      // Gambar latar belakang cell dengan pola catur
+      if ((row + col) % 2 == 0) {
+          g.setColor(Color.WHITE); // Warna putih untuk cell genap
+      } else {
+          g.setColor(Color.BLACK); // Warna hitam untuk cell ganjil
       }
-   }
+      g.fillRect(x1, y1, SIZE, SIZE); // Gambar latar cell
+  
+      //Isi cell dengan gambar seusai turn
+      if (content != Seed.NO_SEED && content.getImage() != null) {
+         g.drawImage(content.getImage(), x1 + PADDING, y1 + PADDING, SEED_SIZE, SEED_SIZE, null);
+     }
+  }   
+  
+  
 }
