@@ -32,26 +32,26 @@ public class GameMain extends JPanel {
       super.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
-             int mouseX = e.getX();
-             int mouseY = e.getY();
-             int row = mouseY / Cell.SIZE;
-             int col = mouseX / Cell.SIZE;
-         
-             if (currentState == State.PLAYING) {
-                 if (currentPlayer == Seed.CROSS) { // Giliran pemain
-                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
-                             && board.cells[row][col].content == Seed.NO_SEED) {
-                         currentState = board.stepGame(currentPlayer, row, col);
-                         currentPlayer = Seed.NOUGHT; // Ganti giliran ke AI
-                         repaint();
-                         if (currentState == State.PLAYING) { // Jika game belum selesai
-                             aiMove(); // Panggil AI untuk bermain
-                         }
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+            int row = mouseY / Cell.SIZE;
+            int col = mouseX / Cell.SIZE;
+      
+            if (currentState == State.PLAYING) {
+               if (currentPlayer == Seed.CROSS) { // Giliran pemain
+                  if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
+                        && board.cells[row][col].content == Seed.NO_SEED) {
+                     currentState = board.stepGame(currentPlayer, row, col);
+                     currentPlayer = Seed.NOUGHT; // Ganti giliran ke AI
+                     repaint();
+                     if (currentState == State.PLAYING) { // Pastikan permainan belum selesai
+                        aiMove();
                      }
-                 }
-             } else { // Game selesai
-                 newGame(); // Restart game
-             }
+                  }
+               }
+            } else { // Game selesai
+               newGame(); // Restart game
+            }
          }
       });
 
@@ -134,7 +134,12 @@ public class GameMain extends JPanel {
          System.out.println("AI memilih langkah: (" + bestMove[0] + ", " + bestMove[1] + ")");
          currentState = board.stepGame(currentPlayer, bestMove[0], bestMove[1]); // Jalankan langkah AI
          currentPlayer = Seed.CROSS; // Ganti giliran ke pemain
-         repaint(); // Refresh tampilan game
+         try {
+            Thread.sleep(300); // Tambahkan delay
+            repaint(); // Refresh tampilan game
+        } catch (InterruptedException a) {
+           a.printStackTrace(); // Tangani exception jika thread terganggu
+        }
       }
    }
 
