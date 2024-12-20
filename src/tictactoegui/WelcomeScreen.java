@@ -64,8 +64,8 @@ public class WelcomeScreen extends JFrame {
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 18));
-        button.setBackground(Color.BLACK); // Black background
-        button.setForeground(Color.WHITE); // White text
+        button.setBackground(Color.WHITE); // Black background
+        button.setForeground(Color.BLACK); // White text
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
         button.setOpaque(true);
@@ -75,14 +75,14 @@ public class WelcomeScreen extends JFrame {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(Color.WHITE); // White background
-                button.setForeground(Color.BLACK); // Black text
+                button.setBackground(Color.BLACK); // White background
+                button.setForeground(Color.WHITE); // Black text
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(Color.BLACK); // Revert to black background
-                button.setForeground(Color.WHITE); // Revert to white text
+                button.setBackground(Color.WHITE); // Revert to black background
+                button.setForeground(Color.BLACK); // Revert to white text
             }
         });
         return button;
