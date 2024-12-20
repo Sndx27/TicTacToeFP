@@ -33,6 +33,7 @@ public class GameMain extends JPanel {
             int col = (mouseX - Board.X_OFFSET) / Cell.SIZE;
       
             if (currentState == State.PLAYING) {
+               SoundEffect.CLICK.play();
                if (currentPlayer == Seed.CROSS) { // Giliran pemain
                   if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
                         && board.cells[row][col].content == Seed.NO_SEED) {
@@ -99,12 +100,15 @@ public class GameMain extends JPanel {
        } else if (currentState == State.DRAW) {
            statusBar.setForeground(Color.RED);
            statusBar.setText("It's a Draw!");
+           SoundEffect.DRAW.play();
        } else if (currentState == State.CROSS_WON) {
            statusBar.setForeground(Color.RED);
            statusBar.setText("Player Won!");
+           SoundEffect.WIN.play();
        } else if (currentState == State.NOUGHT_WON) {
            statusBar.setForeground(Color.RED);
            statusBar.setText("Computer Won!");
+           SoundEffect.WIN.play();
        }
    }
    
