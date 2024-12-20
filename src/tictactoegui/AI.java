@@ -29,7 +29,7 @@ public class AI {
                     board.cells[row][col].content = Seed.NO_SEED; // Undo langkah
                     if (moveScore > bestScore) { // Jika langkah ini lebih baik
                         bestScore = moveScore;
-                        bestMove[0] = row + 1;
+                        bestMove[0] = row ;
                         bestMove[1] = col;
                     }
                 }
