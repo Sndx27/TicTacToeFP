@@ -35,13 +35,13 @@ public class WelcomeScreen extends JFrame {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10)); // Center alignment with spacing
         buttonPanel.setOpaque(false); // Transparent background
 
-        // Create themed buttons
-        JButton startButton = createStyledButton("Start");
-        startButton.addActionListener(e -> {
-            stopMusic(); // Stop background music
-            dispose();   // Close WelcomeScreen
-            SwingUtilities.invokeLater(() -> GameMain.play()); // Start the game
-        });
+        // // Create themed buttons
+        // JButton startButton = createStyledButton("Start");
+        // startButton.addActionListener(e -> {
+        //     stopMusic(); // Stop background music
+        //     dispose();   // Close WelcomeScreen
+        //     SwingUtilities.invokeLater(() -> GameMain.play(true)); // Start the game
+        // });
 
         JButton optionButton = createStyledButton("Options");
         optionButton.addActionListener(e -> showOptions());
@@ -49,10 +49,29 @@ public class WelcomeScreen extends JFrame {
         JButton exitButton = createStyledButton("Exit");
         exitButton.addActionListener(e -> System.exit(0));
 
+        // Tambahkan tombol untuk memilih mode permainan
+        JButton vsAIButton = createStyledButton("Play vs AI");
+        vsAIButton.addActionListener(e -> {
+            stopMusic(); // Stop background music
+            dispose();   // Close WelcomeScreen
+            SwingUtilities.invokeLater(() -> GameMain.play(true)); // Start game vs AI
+        });
+
+        JButton vsPlayerButton = createStyledButton("Play vs Player");
+        vsPlayerButton.addActionListener(e -> {
+            stopMusic(); // Stop background music
+            dispose();   // Close WelcomeScreen
+            SwingUtilities.invokeLater(() -> GameMain.play(false)); // Start game vs Player
+        });
+
         // Add buttons to the panel
-        buttonPanel.add(startButton);
+        buttonPanel.add(vsAIButton);
+        buttonPanel.add(vsPlayerButton);
+        // buttonPanel.add(startButton);
         buttonPanel.add(optionButton);
         buttonPanel.add(exitButton);
+        
+
 
         // Add button panel to the frame
         backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);

@@ -8,6 +8,7 @@ import javax.swing.*;
  */
 public class GameMain extends JPanel {
    private static final long serialVersionUID = 1L; // to prevent serializable warning
+   private boolean vsAI;
    // Define named onstants for the drawing graphics
    public static final String TITLE = "Tic Tac Toe";
    public static final Color COLOR_BG = Color.WHITE;
@@ -22,7 +23,8 @@ public class GameMain extends JPanel {
    private JLabel statusBar;    // for displaying status message
    AI ai = new AI(board); // initialize ai
    /** Constructor to setup the UI and game components */
-   public GameMain() {
+   public GameMain(boolean vsAI) {
+      this.vsAI=vsAI;
       // This JPanel fires MouseEvent
       super.addMouseListener(new MouseAdapter() {
          @Override
@@ -31,23 +33,40 @@ public class GameMain extends JPanel {
             int mouseY = e.getY();
             int row = (mouseY - Board.Y_OFFSET) / Cell.SIZE;
             int col = (mouseX - Board.X_OFFSET) / Cell.SIZE;
-      
+
             if (currentState == State.PLAYING) {
                SoundEffect.CLICK.play();
                if (currentPlayer == Seed.CROSS) { // Giliran pemain
-                  if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
-                        && board.cells[row][col].content == Seed.NO_SEED) {
-                     currentState = board.stepGame(currentPlayer, row, col);
-                     currentPlayer = Seed.NOUGHT; // Ganti giliran ke AI
-                     repaint();
-                  if (currentState != State.PLAYING) {
-                        SwingUtilities.invokeLater(() -> {
-                           showEndGameDialog(getEndGameMessage());
-                        });
-                     } else {
-                        aiMove(); // Panggil langkah AI jika permainan belum selesai
+                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
+                           && board.cells[row][col].content == Seed.NO_SEED) {
+                        currentState = board.stepGame(currentPlayer, row, col);
+                        repaint(); // Refresh tampilan papan permainan
+
+                        if (currentState != State.PLAYING) {
+                           SwingUtilities.invokeLater(() -> {
+                                 showEndGameDialog(getEndGameMessage());
+                           });
+                        } else {
+                           currentPlayer = Seed.NOUGHT; // Ganti giliran ke pemain berikutnya
+                           if (ai != null) {
+                                 aiMove(); // Panggil langkah AI jika bermain melawan AI
+                           }
+                        }
                      }
-                  }
+               } else { // Giliran pemain kedua
+                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
+                           && board.cells[row][col].content == Seed.NO_SEED) {
+                        currentState = board.stepGame(currentPlayer, row, col);
+                        repaint(); // Refresh tampilan papan permainan
+
+                        if (currentState != State.PLAYING) {
+                           SwingUtilities.invokeLater(() -> {
+                                 showEndGameDialog(getEndGameMessage());
+                           });
+                        } else {
+                           currentPlayer = Seed.CROSS; // Kembali ke pemain pertama
+                        }
+                     }
                }
             } else { // Game selesai
                newGame(); // Restart game
@@ -70,6 +89,14 @@ public class GameMain extends JPanel {
       // Set up Game
       initGame();
       newGame();
+      if (vsAI) {
+         // Jika bermain melawan AI, inisialisasi AI
+         this.ai = new AI(board);
+     } else {
+         // Jika bermain melawan pemain lain, tidak perlu AI
+         this.ai = null; // Atau bisa diatur sesuai kebutuhan
+      }
+ 
    }
    /** Initialize the game (run once) */
    public void initGame() {
@@ -96,7 +123,7 @@ public class GameMain extends JPanel {
        // Perbarui status bar berdasarkan status permainan
        if (currentState == State.PLAYING) {
            statusBar.setForeground(Color.BLACK);
-           statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+           statusBar.setText((currentPlayer == Seed.CROSS) ? "White's Turn" : "Black's Turn");
        } else if (currentState == State.DRAW) {
            statusBar.setForeground(Color.RED);
            statusBar.setText("It's a Draw!");
@@ -113,15 +140,14 @@ public class GameMain extends JPanel {
    }
    
    
-   /** The entry "main" method */
-   public static void play() {
+   public static void play(boolean vsAI) {
       javax.swing.SwingUtilities.invokeLater(() -> {
-         JFrame frame = new JFrame(TITLE);
-         frame.setContentPane(new GameMain());
-         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         frame.pack();
-         frame.setLocationRelativeTo(null);
-         frame.setVisible(true);
+          JFrame frame = new JFrame(TITLE);
+          frame.setContentPane(new GameMain(vsAI)); // Pass the mode to GameMain
+          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          frame.pack();
+          frame.setLocationRelativeTo(null);
+          frame.setVisible(true);
       });
    }
    private void aiMove() {
@@ -170,33 +196,41 @@ public class GameMain extends JPanel {
       buttonPanel.setBackground(new Color(30, 30, 30));
       buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
   
+      JButton continueButton = new JButton("Continue");
+      continueButton.setFont(new Font("Arial", Font.BOLD, 14));
+      continueButton.setBackground(new Color(50, 200, 50));
+      continueButton.setForeground(Color.WHITE);
+      continueButton.setFocusPainted(false);
+      continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      continueButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+  
       JButton newGameButton = new JButton("New Game");
       newGameButton.setFont(new Font("Arial", Font.BOLD, 14));
-      newGameButton.setBackground(new Color(50, 200, 50));
+      newGameButton.setBackground(new Color(200, 50, 50));
       newGameButton.setForeground(Color.WHITE);
       newGameButton.setFocusPainted(false);
       newGameButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
       newGameButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
   
-      JButton exitButton = new JButton("Exit");
-      exitButton.setFont(new Font("Arial", Font.BOLD, 14));
-      exitButton.setBackground(new Color(200, 50, 50));
-      exitButton.setForeground(Color.WHITE);
-      exitButton.setFocusPainted(false);
-      exitButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      exitButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-  
-      newGameButton.addActionListener(e -> {
+      continueButton.addActionListener(e -> {
           endGameDialog.dispose(); // Close dialog
-          initGame();
+          // Reset game state and continue
           newGame(); // Reset game
           repaint(); // Refresh game board
       });
   
-      exitButton.addActionListener(e -> System.exit(0));
+      newGameButton.addActionListener(e -> {
+          endGameDialog.dispose(); // Close dialog
+          SwingUtilities.invokeLater(() -> {
+              WelcomeScreen welcomeScreen = new WelcomeScreen();
+              welcomeScreen.setVisible(true);
+          });
+          JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+          topFrame.dispose(); // Close the current game window
+      });
   
+      buttonPanel.add(continueButton);
       buttonPanel.add(newGameButton);
-      buttonPanel.add(exitButton);
   
       // Add panels to dialog
       endGameDialog.add(headerPanel, BorderLayout.CENTER);
@@ -211,9 +245,9 @@ public class GameMain extends JPanel {
   private String getEndGameMessage() {
    switch (currentState) {
        case CROSS_WON:
-           return "Player (X) Won!";
+           return "Black Won!";
        case NOUGHT_WON:
-           return "Computer (O) Won!";
+           return "White Won!";
        case DRAW:
            return "It's a Draw!";
        default:
