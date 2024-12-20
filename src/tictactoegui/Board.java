@@ -1,6 +1,4 @@
-
 package tictactoegui;
-
 import java.awt.*;
 /**
  * The Board class models the ROWS-by-COLS game board.
@@ -12,7 +10,7 @@ public class Board {
    // Define named constants for drawing
    public static final int CANVAS_WIDTH = Cell.SIZE * COLS + 500;  // the drawing canvas
    public static final int CANVAS_HEIGHT = Cell.SIZE * ROWS + 500;
-   public static final int GRID_WIDTH = 4;  // Grid-line's width
+   public static final int GRID_WIDTH = 1;  // Grid-line's width
    public static final int GRID_WIDTH_HALF = GRID_WIDTH / 2; // Grid-line's half-width
    public static final Color COLOR_GRID = Color.BLACK;  // grid lines
    public static final int BOARD_WIDTH = Cell.SIZE * COLS; // Lebar papan
@@ -22,12 +20,10 @@ public class Board {
    // Define properties (package-visible)
    /** Composes of 2D array of ROWS-by-COLS Cell instances */
    Cell[][] cells;
-
    /** Constructor to initialize the game board */
    public Board() {
       initGame();
    }
-
    /** Initialize the game objects (run once) */
    public void initGame() {
       cells = new Cell[ROWS][COLS]; // allocate the array
@@ -39,7 +35,6 @@ public class Board {
          }
       }
    }
-
    /** Reset the game board, ready for new game */
    public void newGame() {
       for (int row = 0; row < ROWS; ++row) {
@@ -48,7 +43,6 @@ public class Board {
          }
       }
    }
-
    /**
     *  The given player makes a move on (selectedRow, selectedCol).
     *  Update cells[selectedRow][selectedCol]. Compute and return the
@@ -59,7 +53,6 @@ public class Board {
    
       // Update game board
       cells[selectedRow][selectedCol].content = player;
-
       // Compute and return the new game state
       if (cells[selectedRow][0].content == player  // 3-in-the-row
             && cells[selectedRow][1].content == player
@@ -89,7 +82,6 @@ public class Board {
       }
   }
   
-
    /** Paint itself on the graphics canvas, given the Graphics context */
    public void paint(Graphics g) {
       Graphics2D g2 = (Graphics2D) g;

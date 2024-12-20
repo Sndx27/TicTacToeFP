@@ -26,17 +26,13 @@ public enum SoundEffect {
    EAT_FOOD("audio/mouse-click.wav"),
    EXPLODE("audio/death-sound.wav"),
    DIE("audio/death-sound.wav");
-
    /** Nested enumeration for specifying volume */
    public static enum Volume {
       MUTE, LOW, MEDIUM, HIGH
    }
-
    public static Volume volume = Volume.LOW;
-
    /** Each sound effect has its own clip, loaded with its own sound file. */
    private Clip clip;
-
    /** Private Constructor to construct each element of the enum with its own sound file. */
    private SoundEffect(String soundFileName) {
       try {
@@ -56,7 +52,6 @@ public enum SoundEffect {
          e.printStackTrace();
       }
    }
-
    /** Play or Re-play the sound effect from the beginning, by rewinding. */
    public void play() {
       if (volume != Volume.MUTE) {
@@ -66,7 +61,6 @@ public enum SoundEffect {
          clip.start();     // Start playing
       }
    }
-
    /** Optional static method to pre-load all the sound files. */
    static void initGame() {
       values(); // calls the constructor for all the elements

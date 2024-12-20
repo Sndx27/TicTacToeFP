@@ -3,11 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package tictactoegui;
-
 /**
  *
  * @author Clay Amsal
  */
-public enum State {  // to save as "State.java"
-   PLAYING, DRAW, CROSS_WON, NOUGHT_WON
+public enum State {
+    PLAYING, CROSS_WON, NOUGHT_WON, DRAW;
 }
