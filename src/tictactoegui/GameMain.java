@@ -1,3 +1,13 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #7
+ * 1 - 5026231066 - Burju Ferdinand Harianja
+ * 2 - 5026231132 - Clay Amsal Sebastian Hutabarat
+ * 3 - 5026213181 - Sandythia Lova Ramadhani Krisnaprana
+ */
+
 package tictactoegui;
 import java.awt.*;
 import java.awt.event.*;
@@ -17,11 +27,22 @@ public class GameMain extends JPanel {
    public static final Color COLOR_NOUGHT = new Color(64, 154, 225); // Blue #409AE1
    public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
    // Define game objects
-   private Board board;         // the game board
-   private State currentState;  // the current state of the game
-   private Seed currentPlayer;  // the current player
-   private JLabel statusBar;    // for displaying status message
-   AI ai = new AI(board); // initialize ai
+   private Board board;
+   private State currentState;
+   private Seed currentPlayer;
+   private JLabel statusBar;
+   private JLabel blackScoreLabel;
+   private JLabel whiteScoreLabel;
+   private JLabel levelLabel;
+   private JProgressBar xpProgressBar;
+   private int blackScore = 0;
+   private int whiteScore = 0;
+   private int userLevel = 1;
+   private int userXP = 0;
+   private final int MAX_LEVEL = 10;
+
+   AI ai;
+
    /** Constructor to setup the UI and game components */
    public GameMain(boolean vsAI) {
       this.vsAI=vsAI;
@@ -43,8 +64,9 @@ public class GameMain extends JPanel {
                         repaint(); // Refresh tampilan papan permainan
 
                         if (currentState != State.PLAYING) {
+                           handleGameEnd(currentState);
                            SwingUtilities.invokeLater(() -> {
-                                 showEndGameDialog(getEndGameMessage());
+                           showEndGameDialog(getEndGameMessage());
                            });
                         } else {
                            currentPlayer = Seed.NOUGHT; // Ganti giliran ke pemain berikutnya
@@ -73,29 +95,42 @@ public class GameMain extends JPanel {
             }
          }
       });
-      // Setup the status bar (JLabel) to display status message
-      statusBar = new JLabel();
-      statusBar.setFont(FONT_STATUS);
-      statusBar.setBackground(COLOR_BG_STATUS);
-      statusBar.setOpaque(true);
-      statusBar.setPreferredSize(new Dimension(300, 30));
-      statusBar.setHorizontalAlignment(JLabel.LEFT);
-      statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
-      super.setLayout(new BorderLayout());
-      super.add(statusBar, BorderLayout.PAGE_END); // same as SOUTH
-      super.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT + 30));
-            // account for statusBar in height
-      super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
-      // Set up Game
-      initGame();
-      newGame();
-      if (vsAI) {
-         // Jika bermain melawan AI, inisialisasi AI
-         this.ai = new AI(board);
-     } else {
-         // Jika bermain melawan pemain lain, tidak perlu AI
-         this.ai = null; // Atau bisa diatur sesuai kebutuhan
-      }
+        // Setup labels and progress bar
+        blackScoreLabel = new JLabel("Black: 0");
+        whiteScoreLabel = new JLabel("White: 0");
+        levelLabel = new JLabel("Level: 1");
+        xpProgressBar = new JProgressBar(0, calculateXPNeededForNextLevel());
+        xpProgressBar.setStringPainted(true);
+
+        // Create info panel
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        infoPanel.add(blackScoreLabel);
+        infoPanel.add(whiteScoreLabel);
+        infoPanel.add(levelLabel);
+        infoPanel.add(xpProgressBar);
+
+        // Setup the status bar
+        statusBar = new JLabel();
+        statusBar.setFont(new Font("OCR A Extended", Font.PLAIN, 14));
+        statusBar.setBackground(COLOR_BG_STATUS);
+        statusBar.setOpaque(true);
+        statusBar.setPreferredSize(new Dimension(300, 30));
+        statusBar.setHorizontalAlignment(JLabel.LEFT);
+
+        // Layout setup
+        setLayout(new BorderLayout());
+        add(infoPanel, BorderLayout.EAST);
+        add(statusBar, BorderLayout.PAGE_END);
+
+        // Initialize game
+        initGame();
+        newGame();
+
+        if (vsAI) {
+            this.ai = new AI(board);
+        } else {
+            this.ai = null;
+        }
  
    }
    /** Initialize the game (run once) */
@@ -142,13 +177,14 @@ public class GameMain extends JPanel {
    
    public static void play(boolean vsAI) {
       javax.swing.SwingUtilities.invokeLater(() -> {
-          JFrame frame = new JFrame(TITLE);
-          frame.setContentPane(new GameMain(vsAI)); // Pass the mode to GameMain
-          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-          frame.pack();
-          frame.setLocationRelativeTo(null);
-          frame.setVisible(true);
-      });
+         JFrame frame = new JFrame(TITLE);
+         frame.setContentPane(new GameMain(vsAI)); // Pass the mode to GameMain
+         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         frame.setSize(1200, 1000); // Ukuran yang lebih besar untuk frame
+         frame.setResizable(false); // Opsional: mencegah perubahan ukuran
+         frame.setLocationRelativeTo(null); // Tengah di layar
+         frame.setVisible(true);
+     });
    }
    private void aiMove() {
       if (currentState == State.PLAYING) {
@@ -167,6 +203,7 @@ public class GameMain extends JPanel {
                   repaint(); // Refresh tampilan papan permainan
                   // Tampilkan popup jika permainan selesai
                   if (currentState != tictactoegui.State.PLAYING) {
+                     handleGameEnd(currentState);
                      SwingUtilities.invokeLater(() -> {
                         showEndGameDialog(getEndGameMessage());
                      });
@@ -242,16 +279,82 @@ public class GameMain extends JPanel {
   
   
   
-  private String getEndGameMessage() {
-   switch (currentState) {
-       case CROSS_WON:
-           return "Black Won!";
-       case NOUGHT_WON:
-           return "White Won!";
-       case DRAW:
-           return "It's a Draw!";
-       default:
-           return "";
+   private String getEndGameMessage() {
+      switch (currentState) {
+         case CROSS_WON:
+            return "Black Won!";
+         case NOUGHT_WON:
+            return "White Won!";
+         case DRAW:
+            return "It's a Draw!";
+         default:
+            return "";
+      }
    }
-}
+
+   private void updatePanels() {
+      blackScoreLabel.setText("Black: " + blackScore);
+      whiteScoreLabel.setText("White: " + whiteScore);
+      levelLabel.setText("Level: " + userLevel);
+  
+      int xpNeeded = calculateXPNeededForNextLevel();
+      xpProgressBar.setMaximum(xpNeeded);
+      xpProgressBar.setValue(userXP);
+      xpProgressBar.setString(userXP + "/" + xpNeeded + " XP");
+      System.out.println("UI diperbarui. Black: " + blackScore + ", White: " + whiteScore + ", Level: " + userLevel + ", XP: " + userXP);
+  }
+  
+  
+  private int calculateXPNeededForNextLevel() {
+      return 5 + (userLevel - 1) * 2;
+  }
+  
+  private void resetForNewGame() {
+      blackScore = 0;
+      whiteScore = 0;
+      userXP = 0;
+      userLevel = 1;
+      updatePanels();
+  }
+  
+   private void handleGameEnd(State gameState) {
+      System.out.println("handleGameEnd dipanggil. State: " + gameState);
+
+      switch (gameState) {
+         case CROSS_WON:
+            blackScore++;
+            System.out.println("Black menang! Skor Black: " + blackScore);
+            userXP += 2;
+            break;
+         case NOUGHT_WON:
+            whiteScore++;
+            System.out.println("White menang! Skor White: " + whiteScore);
+            userXP += 2;
+            break;
+         case DRAW:
+            System.out.println("Permainan seri. Tidak ada perubahan skor atau XP.");
+            break;
+      }
+
+      // Periksa apakah level naik
+      int xpNeeded = calculateXPNeededForNextLevel();
+      if (userXP >= xpNeeded) {
+         userXP -= xpNeeded;
+         userLevel++;
+         System.out.println("Naik level! Level sekarang: " + userLevel);
+      }
+
+      // Penalti XP jika level >= 10
+      if (userLevel >= MAX_LEVEL && gameState == State.NOUGHT_WON) {
+         userXP = Math.max(0, userXP - 10);
+         System.out.println("Penalti XP. XP sekarang: " + userXP);
+      }
+
+      updatePanels(); // Perbarui UI
+      System.out.println("Done update");
+   }
+
+
+
+
 }

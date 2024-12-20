@@ -1,3 +1,13 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #7
+ * 1 - 5026231066 - Burju Ferdinand Harianja
+ * 2 - 5026231132 - Clay Amsal Sebastian Hutabarat
+ * 3 - 5026213181 - Sandythia Lova Ramadhani Krisnaprana
+ */
+
 package tictactoegui;
 import java.awt.*;
 /**
@@ -48,13 +58,14 @@ public class Board {
     *  Update cells[selectedRow][selectedCol]. Compute and return the
     *  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
     */
-    public State stepGame(Seed player, int selectedRow, int selectedCol) {
-      System.out.println("Step game called by: " + player + " at (" + selectedRow + ", " + selectedCol + ")");
-   
-      // Update game board
-      cells[selectedRow][selectedCol].content = player;
-      // Compute and return the new game state
-      if (cells[selectedRow][0].content == player  // 3-in-the-row
+public State stepGame(Seed player, int selectedRow, int selectedCol) {
+    System.out.println("Step game called by: " + player + " at (" + selectedRow + ", " + selectedCol + ")");
+
+    // Update game board
+    cells[selectedRow][selectedCol].content = player;
+
+    // Compute and return the new game state
+    if (cells[selectedRow][0].content == player  // 3-in-the-row
             && cells[selectedRow][1].content == player
             && cells[selectedRow][2].content == player
          || cells[0][selectedCol].content == player // 3-in-the-column
@@ -68,19 +79,29 @@ public class Board {
             && cells[0][2].content == player
             && cells[1][1].content == player
             && cells[2][0].content == player) {
-         return (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
-      } else {
-         // Nobody wins. Check for DRAW or PLAYING.
-         for (int row = 0; row < ROWS; ++row) {
+
+        // Log kemenangan
+        State winState = (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+        System.out.println("Winning move detected! State: " + winState);
+        return winState;
+
+    } else {
+        // Nobody wins. Check for DRAW or PLAYING.
+        for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
-                  if (cells[row][col].content == Seed.NO_SEED) {
-                     return State.PLAYING; // Masih ada kotak kosong
-                  }
+                if (cells[row][col].content == Seed.NO_SEED) {
+                    System.out.println("Game still playing. Empty cell found at (" + row + ", " + col + ")");
+                    return State.PLAYING; // Masih ada kotak kosong
+                }
             }
-         }
-         return State.DRAW; // Tidak ada kotak kosong, game draw
-      }
-  }
+        }
+
+        // Jika semua kotak penuh, permainan seri
+        System.out.println("Game ended in a draw. All cells are filled.");
+        return State.DRAW;
+    }
+}
+
   
    /** Paint itself on the graphics canvas, given the Graphics context */
    public void paint(Graphics g) {
