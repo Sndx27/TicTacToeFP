@@ -94,27 +94,31 @@ public class GameMain extends JPanel {
 
    /** Custom painting codes on this JPanel */
    @Override
-   public void paintComponent(Graphics g) {  // Callback via repaint()
-      super.paintComponent(g);
-      setBackground(COLOR_BG); // set its background color
-
-      board.paint(g);  // ask the game board to paint itself
-
-      // Print status-bar message
-      if (currentState == State.PLAYING) {
-         statusBar.setForeground(Color.BLACK);
-         statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
-      } else if (currentState == State.DRAW) {
-         statusBar.setForeground(Color.RED);
-         statusBar.setText("It's a Draw! Click to play again.");
-      } else if (currentState == State.CROSS_WON) {
-         statusBar.setForeground(Color.RED);
-         statusBar.setText("'X' Won! Click to play again.");
-      } else if (currentState == State.NOUGHT_WON) {
-         statusBar.setForeground(Color.RED);
-         statusBar.setText("'O' Won! Click to play again.");
-      }
+   public void paintComponent(Graphics g) {
+       super.paintComponent(g);
+       setBackground(COLOR_BG); // set its background color
+   
+       board.paint(g); // Ask the game board to paint itself
+   
+       // Print status-bar message
+       if (currentState == State.PLAYING) {
+           statusBar.setForeground(Color.BLACK);
+           statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+       } else if (currentState == State.DRAW) {
+           statusBar.setForeground(Color.RED);
+         //   statusBar.setText("It's a Draw! Click to play again.");
+           showEndGameDialog("It's a Draw!");
+       } else if (currentState == State.CROSS_WON) {
+           statusBar.setForeground(Color.RED);
+         //   statusBar.setText("'X' Won! Click to play again.");
+           showEndGameDialog("Player Won!");
+       } else if (currentState == State.NOUGHT_WON) {
+           statusBar.setForeground(Color.RED);
+         //   statusBar.setText("'O' Won! Click to play again.");
+           showEndGameDialog("Computer Won!");
+       }
    }
+   
 
    /** The entry "main" method */
    public static void play() {
@@ -149,6 +153,28 @@ public class GameMain extends JPanel {
       }
    }
 
+   private void showEndGameDialog(String message) {
+      int choice = JOptionPane.showOptionDialog(
+          this, // Komponen induk (panel ini)
+          message + "\nWhat would you like to do?", // Pesan yang ditampilkan
+          "Game Over", // Judul popup
+          JOptionPane.YES_NO_OPTION, // Jenis opsi (YES_NO)
+          JOptionPane.INFORMATION_MESSAGE, // Jenis pesan
+          null, // Ikon (null jika tidak ingin menampilkan ikon)
+          new String[] { "New Game", "Exit" }, // Teks tombol
+          "New Game" // Tombol default yang dipilih
+      );
+  
+      // Periksa pilihan pengguna
+      if (choice == JOptionPane.YES_OPTION) {
+          newGame(); // Reset game
+          repaint(); // Pastikan papan permainan diperbarui
+      } else if (choice == JOptionPane.NO_OPTION) {
+          System.exit(0); // Keluar dari program
+      }
+  }
+  
+  
 
 }
 
