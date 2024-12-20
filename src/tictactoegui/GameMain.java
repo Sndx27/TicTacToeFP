@@ -146,26 +146,63 @@ public class GameMain extends JPanel {
       }
    }
    private void showEndGameDialog(String message) {
-      int choice = JOptionPane.showOptionDialog(
-          this, // Komponen induk (panel ini)
-          message + "\nWhat would you like to do?", // Pesan yang ditampilkan
-          "Game Over", // Judul popup
-          JOptionPane.YES_NO_OPTION, // Jenis opsi (YES_NO)
-          JOptionPane.INFORMATION_MESSAGE, // Jenis pesan
-          null, // Ikon (null jika tidak ingin menampilkan ikon)
-          new String[] { "New Game", "Exit" }, // Teks tombol
-          "New Game" // Tombol default yang dipilih
-      );
+      // Create a custom dialog for modern aesthetics
+      JDialog endGameDialog = new JDialog((Frame) null, "Game Over", true);
+      endGameDialog.setSize(400, 200);
+      endGameDialog.setLocationRelativeTo(this);
+      endGameDialog.setLayout(new BorderLayout());
   
-      // Periksa pilihan pengguna
-      if (choice == JOptionPane.YES_OPTION) {
-         initGame();
-         newGame(); // Reset game
-         repaint(); // Pastikan papan permainan diperbarui
-      } else if (choice == JOptionPane.NO_OPTION) {
-          System.exit(0); // Keluar dari program
-      }
+      // Header panel with message
+      JPanel headerPanel = new JPanel();
+      headerPanel.setBackground(new Color(50, 50, 50));
+      JLabel messageLabel = new JLabel("<html><div style='text-align: center;'>" + message + "<br>What would you like to do?</div></html>");
+      messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+      messageLabel.setForeground(Color.WHITE);
+      messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      headerPanel.add(messageLabel);
+  
+      // Button panel for options
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.setBackground(new Color(30, 30, 30));
+      buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+  
+      JButton newGameButton = new JButton("New Game");
+      newGameButton.setFont(new Font("Arial", Font.BOLD, 14));
+      newGameButton.setBackground(new Color(50, 200, 50));
+      newGameButton.setForeground(Color.WHITE);
+      newGameButton.setFocusPainted(false);
+      newGameButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      newGameButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+  
+      JButton exitButton = new JButton("Exit");
+      exitButton.setFont(new Font("Arial", Font.BOLD, 14));
+      exitButton.setBackground(new Color(200, 50, 50));
+      exitButton.setForeground(Color.WHITE);
+      exitButton.setFocusPainted(false);
+      exitButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      exitButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+  
+      newGameButton.addActionListener(e -> {
+          endGameDialog.dispose(); // Close dialog
+          initGame();
+          newGame(); // Reset game
+          repaint(); // Refresh game board
+      });
+  
+      exitButton.addActionListener(e -> System.exit(0));
+  
+      buttonPanel.add(newGameButton);
+      buttonPanel.add(exitButton);
+  
+      // Add panels to dialog
+      endGameDialog.add(headerPanel, BorderLayout.CENTER);
+      endGameDialog.add(buttonPanel, BorderLayout.SOUTH);
+  
+      // Display the dialog
+      endGameDialog.setVisible(true);
   }
+  
+  
   
   private String getEndGameMessage() {
    switch (currentState) {

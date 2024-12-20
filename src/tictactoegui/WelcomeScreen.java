@@ -114,14 +114,59 @@ public class WelcomeScreen extends JFrame {
     }
 
     private void showOptions() {
-        JOptionPane.showMessageDialog(this,
-                "<html><div style='text-align: center;'>"
-                        + "Game created by:<br>"
-                        + "<b>Burju Ferdinand Harianja (066)</b><br>"
-                        + "<b>Clay Amsal Sebastian Hutabarat (132)</b><br>"
-                        + "<b>Sandythia Lova Ramadhani Krisnaprana (181)</b>"
-                        + "</div></html>",
-                "About", JOptionPane.INFORMATION_MESSAGE);
+        // Create a custom dialog
+        JDialog optionsDialog = new JDialog(this, "About", true);
+        optionsDialog.setSize(400, 300);
+        optionsDialog.setLocationRelativeTo(this);
+        optionsDialog.setLayout(new BorderLayout());
+    
+        // Header panel with title
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(50, 50, 50));
+        JLabel titleLabel = new JLabel("About the Game");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel);
+    
+        // Content panel with creator information
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBackground(new Color(30, 30, 30));
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+    
+        JLabel creatorLabel1 = new JLabel("\u2022 Burju Ferdinand Harianja (066)");
+        JLabel creatorLabel2 = new JLabel("\u2022 Clay Amsal Sebastian Hutabarat (132)");
+        JLabel creatorLabel3 = new JLabel("\u2022 Sandythia Lova Ramadhani Krisnaprana (181)");
+    
+        JLabel[] labels = { creatorLabel1, creatorLabel2, creatorLabel3 };
+        for (JLabel label : labels) {
+            label.setFont(new Font("Arial", Font.PLAIN, 16));
+            label.setForeground(Color.WHITE);
+            label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            contentPanel.add(Box.createVerticalStrut(10)); // Spacing
+            contentPanel.add(label);
+        }
+    
+        // Footer panel with a close button
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBackground(new Color(50, 50, 50));
+        JButton closeButton = new JButton("Close");
+        closeButton.setFont(new Font("Arial", Font.BOLD, 14));
+        closeButton.setBackground(new Color(200, 50, 50));
+        closeButton.setForeground(Color.WHITE);
+        closeButton.setFocusPainted(false);
+        closeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+    
+        closeButton.addActionListener(e -> optionsDialog.dispose());
+        footerPanel.add(closeButton);
+    
+        // Add panels to dialog
+        optionsDialog.add(headerPanel, BorderLayout.NORTH);
+        optionsDialog.add(contentPanel, BorderLayout.CENTER);
+        optionsDialog.add(footerPanel, BorderLayout.SOUTH);
+    
+        // Display the dialog
+        optionsDialog.setVisible(true);
     }
 
     public static void main(String[] args) {
